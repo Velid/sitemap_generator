@@ -16,19 +16,12 @@ module SitemapGenerator
 
     # Call with a SitemapLocation and string data
     def write(location, raw_data)
-
-      Aws.config(access_key_id: @aws_access_key_id, secret_access_key: @aws_secret_access_key, region: @aws_s3_region)
-      s3 = Aws::S3.new
-      bucket = s3.buckets[@aws_s3_bucket]
-      object = bucket.objects[location.path_in_public]
-
+      s3 = Aws::S3::Resource.new(region: @aws_s3_region, credentials: Aws::Credentials.new(@aws_access_key_id, @aws_secret_access_key))
+      obj = s3.bucket(@aws_s3_bucket).object(location.path_in_public)
       if location.path.to_s =~ /.gz$/
-        object.write(gzip(raw_data), :acl => :public_read,
-                                     :content_encoding => 'gzip',
-                                     :content_type => 'application/xml')
+        obj.put( body: gzip(raw_data), acl: 'public-read', content_encoding: 'gzip', content_type: 'application/xml' )
       else
-        object.write(raw_data, :acl => :public_read,
-                               :content_type => 'application/xml')
+        obj.put( body: raw_data, acl: 'public-read', content_type: 'application/xml' )
       end
 
     end
