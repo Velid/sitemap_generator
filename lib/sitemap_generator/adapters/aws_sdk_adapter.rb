@@ -11,13 +11,13 @@ module SitemapGenerator
       @aws_access_key_id = opts[:aws_access_key_id] || ENV['AWS_ACCESS_KEY_ID']
       @aws_secret_access_key = opts[:aws_secret_access_key] || ENV['AWS_SECRET_ACCESS_KEY']
       @aws_s3_bucket = opts[:aws_s3_bucket] || ENV['AWS_BUCKET']
+      @aws_s3_region = opts[:aws_s3_region] || ENV['AWS_REGION']
     end
 
     # Call with a SitemapLocation and string data
     def write(location, raw_data)
 
-      AWS.config(:access_key_id => @aws_access_key_id,
-                 :secret_access_key => @aws_secret_access_key)
+      AWS.config(access_key_id: @aws_access_key_id, secret_access_key: @aws_secret_access_key, region: @aws_s3_region)
       s3 = AWS::S3.new
       bucket = s3.buckets[@aws_s3_bucket]
       object = bucket.objects[location.path_in_public]
