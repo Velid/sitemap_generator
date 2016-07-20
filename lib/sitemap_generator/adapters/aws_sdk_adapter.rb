@@ -17,8 +17,8 @@ module SitemapGenerator
     # Call with a SitemapLocation and string data
     def write(location, raw_data)
 
-      AWS.config(access_key_id: @aws_access_key_id, secret_access_key: @aws_secret_access_key, region: @aws_s3_region)
-      s3 = AWS::S3.new
+      Aws.config(access_key_id: @aws_access_key_id, secret_access_key: @aws_secret_access_key, region: @aws_s3_region)
+      s3 = Aws::S3.new
       bucket = s3.buckets[@aws_s3_bucket]
       object = bucket.objects[location.path_in_public]
 
