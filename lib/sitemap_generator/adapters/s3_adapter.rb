@@ -1,7 +1,7 @@
 begin
-  require 'fog'
+  require 'fog/storage'
 rescue LoadError
-  raise LoadError.new("Missing required 'fog'.  Please 'gem install fog' and require it in your application.")
+  raise LoadError.new("Missing required 'fog-aws'.  Please 'gem install fog-aws' and require it in your application.")
 end
 
 module SitemapGenerator
@@ -21,11 +21,15 @@ module SitemapGenerator
     def write(location, raw_data)
       SitemapGenerator::FileAdapter.new.write(location, raw_data)
 
-      credentials = {
-        :aws_access_key_id     => @aws_access_key_id,
-        :aws_secret_access_key => @aws_secret_access_key,
-        :provider              => @fog_provider,
-      }
+      credentials = { :provider => @fog_provider }
+
+      if @aws_access_key_id && @aws_secret_access_key
+        credentials[:aws_access_key_id] = @aws_access_key_id
+        credentials[:aws_secret_access_key] = @aws_secret_access_key
+      else
+        credentials[:use_iam_profile] = true
+      end
+
       credentials[:region] = @fog_region if @fog_region
       credentials[:path_style] = @fog_path_style if @fog_path_style
 
